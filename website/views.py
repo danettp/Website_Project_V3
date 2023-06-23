@@ -8,11 +8,15 @@ views = Blueprint("views", __name__)
 
 @views.route("/")
 @views.route("/home")
-@login_required
 def home():
     posts = Post.query.all()
     return render_template("home.html", user=current_user, posts=posts)
 
+@views.route("/blog")
+@login_required
+def blog():
+    posts = Post.query.all()
+    return render_template("blog.html", user=current_user, posts=posts)
 
 @views.route("/create-post", methods=['GET', 'POST'])
 @login_required
