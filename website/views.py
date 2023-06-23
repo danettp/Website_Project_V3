@@ -31,7 +31,7 @@ def create_post():
             db.session.add(post)
             db.session.commit()
             flash('Post created!', category='success')
-            return redirect(url_for('views.home'))
+            return redirect(url_for('views.blog'))
 
     return render_template('create_post.html', user=current_user)
 
