@@ -3,12 +3,14 @@ from flask_login import login_required, current_user
 from .models import Post, User, Comment, Like
 from . import db
 
+# Create a Blueprint for the views
 views = Blueprint("views", __name__)
 
-
+# Route for the home page
 @views.route("/")
 @views.route("/home")
 def home():
+    # Query all posts from the database
     posts = Post.query.all()
     return render_template("home.html", user=current_user, posts=posts)
 
@@ -35,37 +37,38 @@ def create_post():
 
     return render_template('create_post.html', user=current_user)
 
-
+# Route for deleting a post
 @views.route("/delete-post/<id>")
 @login_required
 def delete_post(id):
-    post = Post.query.filter_by(id=id).first()
+    post = Post.query.filter_by(id=id).first() # Find the post by its ID
 
     if not post:
         flash("Post does not exist.", category='error')
     elif current_user.id != post.id:
         flash('You do not have permission to delete this post.', category='error')
     else:
+        # Delete the post from the database
         db.session.delete(post)
         db.session.commit()
         flash('Post deleted.', category='success')
 
     return redirect(url_for('views.blog'))
 
-
+# Route for displaying all posts by a specific user
 @views.route("/posts/<username>")
 @login_required
 def posts(username):
-    user = User.query.filter_by(username=username).first()
+    user = User.query.filter_by(username=username).first() # Find the user by their username
 
     if not user:
         flash('No user with that username exists.', category='error')
         return redirect(url_for('views.blog'))
 
-    posts = user.posts
+    posts = user.posts # Get all posts by the user
     return render_template("posts.html", user=current_user, posts=posts, username=username)
 
-
+# Route for creating a new comment on a post
 @views.route("/create-comment/<post_id>", methods=['POST'])
 @login_required
 def create_comment(post_id):
@@ -74,8 +77,9 @@ def create_comment(post_id):
     if not text:
         flash('Comment cannot be empty.', category='error')
     else:
-        post = Post.query.filter_by(id=post_id)
+        post = Post.query.filter_by(id=post_id) # Find the post by its ID
         if post:
+            # Create a new comment and add it to the database
             comment = Comment(
                 text=text, author=current_user.id, post_id=post_id)
             db.session.add(comment)
@@ -85,7 +89,7 @@ def create_comment(post_id):
 
     return redirect(url_for('views.blog'))
 
-
+# Route for deleting a comment
 @views.route("/delete-comment/<comment_id>")
 @login_required
 def delete_comment(comment_id):
@@ -96,25 +100,27 @@ def delete_comment(comment_id):
     elif current_user.id != comment.author and current_user.id != comment.post.author:
         flash('You do not have permission to delete this comment.', category='error')
     else:
-        db.session.delete(comment)
+        db.session.delete(comment) # Delete the comment from the database
         db.session.commit()
 
     return redirect(url_for('views.blog'))
 
-
+# Route for liking a post
 @views.route("/like-post/<post_id>", methods=['POST'])
 @login_required
 def like(post_id):
     post = Post.query.filter_by(id=post_id).first()
     like = Like.query.filter_by(
-        author=current_user.id, post_id=post_id).first()
+        author=current_user.id, post_id=post_id).first() # Check if the user has already liked the post
 
     if not post:
         return jsonify({'error': 'Post does not exist.'}, 400)
     elif like:
+        # If the user has already liked the post, remove the like
         db.session.delete(like)
         db.session.commit()
     else:
+        # If the user hasn't liked the post, add a new like
         like = Like(author=current_user.id, post_id=post_id)
         db.session.add(like)
         db.session.commit()
