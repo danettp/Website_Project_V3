@@ -4137,6 +4137,11 @@ textarea.form-control-lg {
   overflow-y: visible;
 }
 
+h2 {
+
+  color: red;
+
+}
 .navbar-dark {
   --bs-navbar-color: rgba(255, 255, 255, 0.55);
   --bs-navbar-hover-color: rgba(255, 255, 255, 0.75);
