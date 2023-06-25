@@ -50,7 +50,7 @@ def delete_post(id):
         db.session.commit()
         flash('Post deleted.', category='success')
 
-    return redirect(url_for('views.home'))
+    return redirect(url_for('views.blog'))
 
 
 @views.route("/posts/<username>")
@@ -60,7 +60,7 @@ def posts(username):
 
     if not user:
         flash('No user with that username exists.', category='error')
-        return redirect(url_for('views.home'))
+        return redirect(url_for('views.blog'))
 
     posts = user.posts
     return render_template("posts.html", user=current_user, posts=posts, username=username)
@@ -83,7 +83,7 @@ def create_comment(post_id):
         else:
             flash('Post does not exist.', category='error')
 
-    return redirect(url_for('views.home'))
+    return redirect(url_for('views.blog'))
 
 
 @views.route("/delete-comment/<comment_id>")
@@ -99,7 +99,7 @@ def delete_comment(comment_id):
         db.session.delete(comment)
         db.session.commit()
 
-    return redirect(url_for('views.home'))
+    return redirect(url_for('views.blog'))
 
 
 @views.route("/like-post/<post_id>", methods=['POST'])
